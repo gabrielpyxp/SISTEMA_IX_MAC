@@ -17,13 +17,13 @@
   --accent-gold: #FACC15;
   --accent-gold-soft: rgba(250, 204, 21, 0.12);
   --success: #22c55e;
-  --warning: #eab308;
-  --danger: #ef4444;
-  --info: #3b82f6;
+  --warning: #FACC15;
+  --danger: #dc2626;
+  --info: #FACC15;
   --green: #22c55e;
   --yellow: #FACC15;
-  --orange: #f97316;
-  --pink: #ec4899;
+  --orange: #FACC15;
+  --pink: #dc2626;
   --shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
   --radius: 12px;
@@ -148,14 +148,11 @@ select { cursor: pointer; appearance: none; background-image: url("data:image/sv
 .product-select-card.active { background: var(--accent); border-color: var(--accent); color: white; box-shadow: 0 6px 20px var(--accent-glow); }
 .product-select-card.active small { color: rgba(255,255,255,0.7); }
 
-/* Auth */
-.auth-page { min-height: 100vh; display: grid; grid-template-columns: 1fr 420px; background: var(--bg); position: relative; overflow: hidden; }
-.auth-glow { position: absolute; width: 500px; height: 500px; border-radius: 50%; filter: blur(120px); opacity: 0.12; pointer-events: none; background: var(--accent); }
-.auth-brand { padding: 60px 80px; display: flex; flex-direction: column; justify-content: center; position: relative; }
-.auth-copy h1 { font-size: 36px; font-weight: 800; line-height: 1.1; margin-bottom: 16px; }
-.auth-copy p { color: var(--text-muted); }
-.login-panel { display: flex; align-items: center; justify-content: center; padding: 40px 24px; }
-.login-card { width: 100%; max-width: 380px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; }
+/* Auth - login centralizado */
+.auth-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg); position: relative; overflow: hidden; padding: 24px; }
+.auth-glow { position: absolute; width: 600px; height: 600px; border-radius: 50%; filter: blur(140px); opacity: 0.10; pointer-events: none; background: var(--accent); top: -200px; right: -200px; }
+.login-panel { display: flex; align-items: center; justify-content: center; width: 100%; }
+.login-card { width: 100%; max-width: 400px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; box-shadow: var(--shadow); }
 
 /* Toast */
 .toast { position: fixed; bottom: 24px; right: 24px; display: flex; gap: 10px; padding: 14px 18px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); z-index: 200; }

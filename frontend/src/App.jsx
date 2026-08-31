@@ -24,10 +24,10 @@ function Shell() {
   );
 
   const titles = {
-    '/': { title: 'Nova Venda', breadcrumb: 'MAC / Vendas', subtitle: 'PDV rápido - toque nos produtos' },
-    '/dashboard': { title: 'Dashboard', breadcrumb: 'MAC / Dashboard', subtitle: 'Visão geral do evento' },
-    '/historico': { title: 'Histórico', breadcrumb: 'MAC / Histórico', subtitle: `${pathname}` },
-    '/produtos': { title: 'Produtos', breadcrumb: 'MAC / Produtos', subtitle: 'Estoque do minimercado' },
+    '/': { title: 'Nova Venda', breadcrumb: 'MAC / Vendas', subtitle: '' },
+    '/dashboard': { title: 'Dashboard', breadcrumb: 'MAC / Dashboard', subtitle: '' },
+    '/historico': { title: 'Histórico', breadcrumb: 'MAC / Histórico', subtitle: '' },
+    '/produtos': { title: 'Produtos', breadcrumb: 'MAC / Produtos', subtitle: '' },
   };
   const cur = titles[pathname] || { title: 'MAC', breadcrumb: 'MAC' };
 

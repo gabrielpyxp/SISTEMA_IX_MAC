@@ -22,7 +22,7 @@ export default function Vendas() {
   return (
     <div className="page">
       <div className="page-heading">
-        <div><span className="eyebrow">PDV • Mobile First</span><h1>Nova <span>Venda</span></h1><p>Selecione produtos com toque — bordô + dourado</p></div>
+        <div><h1>Nova <span>Venda</span></h1></div>
       </div>
 
       <form onSubmit={vender} className="card" style={{padding:'20px', display:'flex', flexDirection:'column', gap:'16px'}}>
@@ -41,7 +41,6 @@ export default function Vendas() {
         </button>
 
         <div>
-          <span className="eyebrow" style={{marginBottom:'10px', display:'block'}}>Produtos • toque para adicionar</span>
           <div className="catalog-grid">
             {produtos.map(p=>{
               const sel=!!carrinho.find(x=>x.id===p.id);

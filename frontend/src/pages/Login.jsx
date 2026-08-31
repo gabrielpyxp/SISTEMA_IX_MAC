@@ -18,20 +18,7 @@ export default function Login() {
   };
   return (
     <div className="auth-page">
-      <div className="auth-glow" style={{top:'-100px', right:'-100px'}}/>
-      <div className="auth-brand">
-        <div style={{display:'flex', alignItems:'center', gap:'12px', fontWeight:800, fontSize:'28px'}}>
-          <div style={{width:'48px', height:'48px', borderRadius:'50%', background:'var(--accent)', display:'flex', alignItems:'center', justifyContent:'center', padding:'6px', border:'1px solid var(--border)'}}>
-            <img src="/logo-mac.png" alt="MAC" style={{width:'100%', height:'100%', objectFit:'contain', borderRadius:'50%'}}/>
-          </div>
-          ENCONTRO <span style={{color:'var(--accent)'}}>MAC</span>
-        </div>
-        <div className="auth-copy">
-          <span className="eyebrow">Movimento de Amizade com Cristo</span>
-          <h1>Minimercado <span style={{color:'var(--accent)'}}>premium</span></h1>
-          <p>Sistema dark bordô + dourado. Rápido no celular, pronto para 2 dias de evento.</p>
-        </div>
-      </div>
+      <div className="auth-glow" />
       <div className="login-panel">
         <form onSubmit={handle} className="login-card">
           <div style={{display:'flex', alignItems:'center', gap:'12px', marginBottom:'20px'}}>
