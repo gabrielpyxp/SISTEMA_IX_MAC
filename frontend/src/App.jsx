@@ -11,32 +11,36 @@ import Historico from './pages/Historico.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 
 function Shell() {
-  const { user, logout } = useAuth();
+  const { user, logout, loading } = useAuth();
   const [open, setOpen] = useState(false);
   const nav = useNavigate();
   const { pathname } = useLocation();
 
-  if (!user) return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="*" element={<Navigate to="/login" replace />} />
-    </Routes>
-  );
+  // enquanto valida token, mostra loading escuro (evita flash preto)
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black text-zinc-400">
+        <div className="w-8 h-8 border-2 border-zinc-700 border-t-[#FACC15] rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  // sem user -> redireciona (sem criar Routes aninhado que quebra SPA)
+  if (!user) return <Navigate to="/login" replace />;
 
   const titles = {
-    '/': { title: 'Nova Venda', breadcrumb: 'MAC / Vendas', subtitle: '' },
-    '/dashboard': { title: 'Dashboard', breadcrumb: 'MAC / Dashboard', subtitle: '' },
-    '/historico': { title: 'Histórico', breadcrumb: 'MAC / Histórico', subtitle: '' },
-    '/produtos': { title: 'Produtos', breadcrumb: 'MAC / Produtos', subtitle: '' },
+    '/': { title: 'Nova Venda', breadcrumb: 'MAC / Vendas' },
+    '/dashboard': { title: 'Dashboard', breadcrumb: 'MAC / Dashboard' },
+    '/historico': { title: 'Histórico', breadcrumb: 'MAC / Histórico' },
+    '/produtos': { title: 'Produtos', breadcrumb: 'MAC / Produtos' },
   };
   const cur = titles[pathname] || { title: 'MAC', breadcrumb: 'MAC' };
-
   const handleLogout = () => { logout(); nav('/login'); };
 
   return (
     <div className="app-shell">
       <Sidebar open={open} onClose={() => setOpen(false)} onLogout={handleLogout} />
-      <Topbar onMenu={() => setOpen(v => !v)} title={cur.title} subtitle={cur.subtitle} breadcrumb={cur.breadcrumb} />
+      <Topbar onMenu={() => setOpen(v => !v)} title={cur.title} breadcrumb={cur.breadcrumb} />
       <main className="main-content">
         <div className="page-content">
           <Routes>
@@ -44,7 +48,7 @@ function Shell() {
             <Route path="/produtos" element={<ProtectedRoute><Produtos /></ProtectedRoute>} />
             <Route path="/historico" element={<ProtectedRoute><Historico /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="*" element={<Navigate to="/" />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
       </main>
