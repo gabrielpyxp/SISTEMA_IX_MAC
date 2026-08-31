@@ -49,9 +49,9 @@ export default function Login() {
 
   return (
     <div className="auth-page">
-      <div className="auth-glow" />
-      <div className="login-panel">
-        <form onSubmit={handle} className="login-card" noValidate>
+      <div className="auth-glow pointer-events-none -z-10" aria-hidden="true" />
+      <div className="login-panel relative z-10">
+        <form onSubmit={handle} className="login-card relative z-10" noValidate>
           <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'12px', marginBottom:'20px', textAlign:'center'}}>
             <div className="w-12 h-12 rounded-full flex items-center justify-center bg-[#5C161B] overflow-hidden border border-[#FACC15]/20" style={{width:'48px', height:'48px', borderRadius:'9999px', background:'#5C161B', border:'1px solid rgba(250,204,21,0.2)', overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center'}}>
               <img src="/logo-mac-transparente.png" alt="MAC" className="w-full h-full object-contain p-1" style={{width:'100%', height:'100%', objectFit:'contain', padding:'4px'}} />

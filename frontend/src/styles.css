@@ -148,11 +148,11 @@ select { cursor: pointer; appearance: none; background-image: url("data:image/sv
 .product-select-card.active { background: var(--accent); border-color: var(--accent); color: white; box-shadow: 0 6px 20px var(--accent-glow); }
 .product-select-card.active small { color: rgba(255,255,255,0.7); }
 
-/* Auth - login centralizado */
-.auth-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg); position: relative; overflow: hidden; padding: 24px; }
-.auth-glow { position: absolute; width: 600px; height: 600px; border-radius: 50%; filter: blur(140px); opacity: 0.10; pointer-events: none; background: var(--accent); top: -200px; right: -200px; }
-.login-panel { display: flex; align-items: center; justify-content: center; width: 100%; }
-.login-card { width: 100%; max-width: 400px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; box-shadow: var(--shadow); }
+/* Auth - login centralizado (corrigido z-index / pointer-events) */
+.auth-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg); position: relative; overflow: hidden; padding: 24px; isolation: isolate; }
+.auth-glow { position: absolute; width: 600px; height: 600px; border-radius: 50%; filter: blur(140px); opacity: 0.10; background: var(--accent); top: -200px; right: -200px; pointer-events: none; z-index: -10; }
+.login-panel { display: flex; align-items: center; justify-content: center; width: 100%; position: relative; z-index: 10; }
+.login-card { width: 100%; max-width: 400px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; box-shadow: var(--shadow); position: relative; z-index: 10; }
 
 /* Toast */
 .toast { position: fixed; bottom: 24px; right: 24px; display: flex; gap: 10px; padding: 14px 18px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); z-index: 200; }
