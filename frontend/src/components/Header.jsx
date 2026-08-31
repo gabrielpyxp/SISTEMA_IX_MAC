@@ -1,31 +1,67 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
+import { LogOut, LayoutDashboard, ShoppingCart, Package, History } from 'lucide-react';
+
+const navItems = [
+  { to: '/', label: 'Vendas', icon: ShoppingCart },
+  { to: '/historico', label: 'Histórico', icon: History },
+  { to: '/produtos', label: 'Produtos', icon: Package },
+  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+];
 
 export default function Header() {
   const { user, logout } = useAuth();
   const nav = useNavigate();
+  const { pathname } = useLocation();
   const handleLogout = () => { logout(); nav('/login'); };
 
   return (
-    <header className="bg-bordo text-white sticky top-0 z-10 shadow">
-      <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-        <Link to="/" className="font-bold text-lg tracking-tight">✝ Encontro MAC</Link>
+    <header className="sticky top-0 z-20 bg-zinc-950/80 backdrop-blur-md border-b border-zinc-800">
+      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+        {/* Logo com fundo bordô */}
+        <Link to="/" className="flex items-center gap-3">
+          <div className="rounded-full w-12 h-12 bg-[#5C161B] flex items-center justify-center p-1 border border-white/10 shadow">
+            <img src="/logo-mac.png" alt="MAC - Movimento de Amizade com Cristo" className="w-full h-full object-contain rounded-full" />
+          </div>
+          <div className="leading-tight">
+            <p className="font-black text-zinc-50 text-sm tracking-widest">ENCONTRO MAC</p>
+            <p className="text-[10px] text-zinc-400 tracking-[0.2em] uppercase">Minimercado</p>
+          </div>
+        </Link>
+
         {user && (
-          <nav className="flex gap-2 text-sm items-center">
-            <Link to="/" className="hover:text-dourado hidden sm:inline">Vendas</Link>
-            <Link to="/historico" className="hover:text-dourado hidden sm:inline">Histórico</Link>
-            <Link to="/produtos" className="hover:text-dourado hidden sm:inline">Produtos</Link>
-            <Link to="/dashboard" className="hover:text-dourado hidden sm:inline">Dashboard</Link>
-            <button onClick={handleLogout} className="bg-dourado text-bordo px-3 py-1 rounded-full font-bold text-xs">Sair</button>
+          <nav className="hidden sm:flex items-center gap-1">
+            {navItems.map(({ to, label, icon: Icon }) => {
+              const active = pathname === to;
+              return (
+                <Link key={to} to={to} className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition ${active ? 'bg-zinc-900 text-zinc-50 border border-zinc-800' : 'text-zinc-400 hover:text-zinc-50 hover:bg-zinc-900'}`}>
+                  <Icon size={16} /> {label}
+                </Link>
+              );
+            })}
+            <button onClick={handleLogout} className="ml-2 bg-[#5C161B] hover:bg-[#7a1d24] text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition">
+              <LogOut size={16} /> Sair
+            </button>
           </nav>
         )}
+
+        {user && (
+          <button onClick={handleLogout} className="sm:hidden bg-[#5C161B] text-white p-2.5 rounded-xl">
+            <LogOut size={18} />
+          </button>
+        )}
       </div>
+
       {user && (
-        <div className="bg-bordoHover flex justify-around sm:hidden text-xs py-2 border-t border-white/10">
-          <Link to="/">Vendas</Link>
-          <Link to="/historico">Histórico</Link>
-          <Link to="/produtos">Produtos</Link>
-          <Link to="/dashboard">Dashboard</Link>
+        <div className="sm:hidden border-t border-zinc-800 bg-zinc-950/80 backdrop-blur-md flex justify-around py-2 px-2">
+          {navItems.map(({ to, label, icon: Icon }) => {
+            const active = pathname === to;
+            return (
+              <Link key={to} to={to} className={`flex flex-col items-center gap-1 text-[10px] px-3 py-1.5 rounded-xl ${active ? 'bg-zinc-900 text-zinc-50 border border-zinc-800' : 'text-zinc-500'}`}>
+                <Icon size={18} /> {label}
+              </Link>
+            );
+          })}
         </div>
       )}
     </header>
