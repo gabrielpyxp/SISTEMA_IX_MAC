@@ -20,8 +20,8 @@ export default function Header() {
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
         {/* Logo com fundo bordô */}
         <Link to="/" className="flex items-center gap-3">
-          <div className="rounded-full w-12 h-12 bg-[#5C161B] flex items-center justify-center p-1 border border-white/10 shadow">
-            <img src="/logo-mac.png" alt="MAC - Movimento de Amizade com Cristo" className="w-full h-full object-contain rounded-full" />
+          <div className="w-12 h-12 rounded-full flex items-center justify-center bg-[#5C161B] overflow-hidden border border-[#FACC15]/20">
+            <img src="/logo-mac-transparente.png" alt="MAC" className="w-full h-full object-contain p-1" />
           </div>
           <div className="leading-tight">
             <p className="font-black text-zinc-50 text-sm tracking-widest">ENCONTRO MAC</p>

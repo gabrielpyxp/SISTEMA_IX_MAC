@@ -17,8 +17,8 @@ export default function Sidebar({ open, onClose, onLogout }) {
       <aside className={`sidebar ${open ? 'sidebar-open' : ''}`}>
         <div className="sidebar-head">
           <div className="sidebar-brand">
-            <div className="sidebar-logo-wrap">
-              <img src="/logo-mac.png" alt="MAC" />
+            <div className="w-12 h-12 rounded-full flex items-center justify-center bg-[#5C161B] overflow-hidden border border-[#FACC15]/20" style={{width:'48px', height:'48px', borderRadius:'9999px', background:'#5C161B', border:'1px solid rgba(250,204,21,0.2)', overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0}}>
+              <img src="/logo-mac-transparente.png" alt="MAC" className="w-full h-full object-contain p-1" style={{width:'100%', height:'100%', objectFit:'contain', padding:'4px'}} />
             </div>
             <div>
               <strong className="text-zinc-50">ENCONTRO MAC</strong><br />
