@@ -11,21 +11,16 @@ export function AuthProvider({ children }) {
     let cancelled = false;
     const init = async () => {
       try {
-        const token = (() => {
-          try { return localStorage.getItem('mac_token'); } catch { return null; }
-        })();
+        const token = (() => { try { return localStorage.getItem('mac_token'); } catch { return null; } })();
         if (!token || typeof token !== 'string' || token.trim() === '') {
           if (!cancelled) setUser(null);
           return;
         }
-        // token existe -> valida no backend (não faz parse local pra não quebrar com token corrompido)
         const { data } = await api.get('/auth/me');
         if (!cancelled) setUser(data || null);
       } catch (err) {
-        // 401, rede ou token inválido -> limpa silenciosamente, sem crash
         try { localStorage.removeItem('mac_token'); } catch {}
         if (!cancelled) setUser(null);
-        // não relança -> evita ErrorBoundary
         const is401 = err?.response?.status === 401;
         if (!is401) console.warn('[Auth] init falhou:', err?.message);
       } finally {
@@ -36,18 +31,26 @@ export function AuthProvider({ children }) {
     return () => { cancelled = true; };
   }, []);
 
+  // Refatoração com Try/Catch robusto — nunca estoura tela preta
   const login = async (email, senha) => {
     try {
-      const { data } = await api.post('/auth/login', { email, senha });
+      // defesa extra: se vier vazio do form, já falha aqui sem bater API
+      if (!email?.trim() || !senha?.trim()) {
+        const e = new Error('E-mail e senha são obrigatórios');
+        e.response = { status: 400, data: { error: 'email e senha obrigatórios' } };
+        throw e;
+      }
+      const { data } = await api.post('/auth/login', { email: email.trim(), senha: senha.trim() });
       if (!data?.token) throw new Error('Token não retornado pelo servidor');
       try { localStorage.setItem('mac_token', data.token); } catch {}
       setUser(data.usuario || null);
       return data;
     } catch (err) {
-      // garante que estado não fica sujo
+      // garante estado limpo e repassa erro para Login exibir (não crasha)
       try { localStorage.removeItem('mac_token'); } catch {}
       setUser(null);
-      throw err; // Login.jsx vai exibir a mensagem
+      // preserva mensagem do backend (HttpError 400/401) para UI
+      throw err;
     }
   };
 
