@@ -1,15 +1,13 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api.js';
-import { Package, Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 
 export default function Produtos() {
   const [produtos, setProdutos] = useState([]);
   const [form, setForm] = useState({ nome:'', preco:'', estoque:'', descricao:'' });
   const [editing, setEditing] = useState(null);
-
   const load = async () => { const {data}=await api.get('/produtos'); setProdutos(data); };
   useEffect(()=>{ load(); },[]);
-
   const submit = async (e) => {
     e.preventDefault();
     const payload = { ...form, preco: Number(form.preco), estoque: Number(form.estoque||0) };
@@ -19,38 +17,40 @@ export default function Produtos() {
   };
   const remove = async (id) => { if(confirm('Remover?')){ await api.delete(`/produtos/${id}`); load(); } };
 
-  const inputCls = "bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-3 text-zinc-50 placeholder-zinc-500 focus:ring-2 focus:ring-[#FACC15] focus:border-[#FACC15] focus:outline-none transition";
-
   return (
-    <div className="min-h-[calc(100vh-80px)] bg-zinc-950 px-4 py-6">
-      <div className="max-w-5xl mx-auto space-y-6">
-        <h1 className="text-2xl font-black text-zinc-50 flex items-center gap-2"><Package className="text-[#FACC15]"/> Produtos</h1>
+    <div className="page">
+      <div className="page-heading">
+        <div><span className="eyebrow">Minimercado</span><h1>Produtos</h1><p>Gerencie estoque — foco dourado nos inputs</p></div>
+      </div>
 
-        <form onSubmit={submit} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 grid grid-cols-2 gap-3">
-          <input className={`${inputCls} col-span-2`} placeholder="Nome *" required value={form.nome} onChange={e=>setForm({...form,nome:e.target.value})} />
-          <input className={inputCls} type="number" step="0.01" placeholder="Preço *" required value={form.preco} onChange={e=>setForm({...form,preco:e.target.value})} />
-          <input className={inputCls} type="number" placeholder="Estoque" value={form.estoque} onChange={e=>setForm({...form,estoque:e.target.value})} />
-          <input className={`${inputCls} col-span-2`} placeholder="Descrição" value={form.descricao} onChange={e=>setForm({...form,descricao:e.target.value})} />
-          <button className="col-span-2 w-full bg-[#5C161B] hover:bg-[#7a1d24] text-white font-bold py-3 rounded-xl transition">{editing ? 'Atualizar' : 'Cadastrar'} Produto</button>
-          {editing && <button type="button" onClick={()=>{setEditing(null);setForm({nome:'',preco:'',estoque:'',descricao:''})}} className="col-span-2 w-full bg-zinc-800 border border-zinc-700 text-zinc-300 py-3 rounded-xl">Cancelar edição</button>}
-        </form>
-
-        <div className="grid gap-3">
-          {produtos.map(p=>(
-            <div key={p.id} className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex justify-between items-center">
-              <div>
-                <p className="font-bold text-zinc-50">{p.nome}</p>
-                <p className="text-sm text-zinc-400">R$ {Number(p.preco).toFixed(2)} • Estoque: {p.estoque}</p>
-                {p.descricao && <p className="text-xs text-zinc-500">{p.descricao}</p>}
-              </div>
-              <div className="flex gap-2">
-                <button onClick={()=>{setEditing(p.id); setForm({nome:p.nome,preco:p.preco,estoque:p.estoque,descricao:p.descricao||''})}} className="bg-[#FACC15] text-zinc-950 px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1"><Pencil size={14}/> Editar</button>
-                <button onClick={()=>remove(p.id)} className="bg-zinc-800 border border-zinc-700 text-zinc-400 hover:text-red-400 px-3 py-2 rounded-xl text-sm flex items-center gap-1"><Trash2 size={14}/> Excluir</button>
-              </div>
-            </div>
-          ))}
-          {!produtos.length && <p className="text-center text-zinc-500 py-8">Nenhum produto cadastrado</p>}
+      <form onSubmit={submit} className="card" style={{padding:'20px'}}>
+        <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px'}}>
+          <label style={{gridColumn:'1/-1'}}>Nome *<input placeholder="Ex: Água 500ml" required value={form.nome} onChange={e=>setForm({...form,nome:e.target.value})} /></label>
+          <label>Preço *<input type="number" step="0.01" placeholder="3.00" required value={form.preco} onChange={e=>setForm({...form,preco:e.target.value})} /></label>
+          <label>Estoque<input type="number" placeholder="100" value={form.estoque} onChange={e=>setForm({...form,estoque:e.target.value})} /></label>
+          <label style={{gridColumn:'1/-1'}}>Descrição<input placeholder="Opcional" value={form.descricao} onChange={e=>setForm({...form,descricao:e.target.value})} /></label>
         </div>
+        <div style={{display:'flex', gap:'12px', marginTop:'16px'}}>
+          <button className="button button-primary" style={{flex:1}}>{editing ? 'Atualizar' : 'Cadastrar'} Produto</button>
+          {editing && <button type="button" onClick={()=>{setEditing(null);setForm({nome:'',preco:'',estoque:'',descricao:''})}} className="button button-secondary">Cancelar</button>}
+        </div>
+      </form>
+
+      <div style={{display:'flex', flexDirection:'column', gap:'12px'}}>
+        {produtos.map(p=>(
+          <div key={p.id} className="card" style={{padding:'16px', display:'flex', justifyContent:'space-between', alignItems:'center', gap:'12px'}}>
+            <div style={{minWidth:0}}>
+              <strong style={{fontSize:'15px'}}>{p.nome}</strong>
+              <div style={{color:'var(--text-muted)', fontSize:'13px'}}>R$ {Number(p.preco).toFixed(2)} • Estoque: {p.estoque}</div>
+              {p.descricao && <small style={{color:'var(--text-dim)'}}>{p.descricao}</small>}
+            </div>
+            <div style={{display:'flex', gap:'8px', flexShrink:0}}>
+              <button onClick={()=>{setEditing(p.id); setForm({nome:p.nome,preco:p.preco,estoque:p.estoque,descricao:p.descricao||''})}} className="button button-gold" style={{padding:'8px 14px'}}><Pencil size={14}/> Editar</button>
+              <button onClick={()=>remove(p.id)} className="button button-secondary" style={{padding:'8px 14px'}}><Trash2 size={14}/> Excluir</button>
+            </div>
+          </div>
+        ))}
+        {!produtos.length && <div className="card" style={{padding:'32px', textAlign:'center', color:'var(--text-dim)'}}>Nenhum produto cadastrado</div>}
       </div>
     </div>
   );
