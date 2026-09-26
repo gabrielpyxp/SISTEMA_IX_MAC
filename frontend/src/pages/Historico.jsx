@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api.js';
+import { Trash2 } from 'lucide-react';
 
 export default function Historico(){
   const [vendas,setVendas]=useState([]);
@@ -8,6 +9,15 @@ export default function Historico(){
   const toggleStatus=async(v)=>{
     const novo = v.status_pagamento==='Pago'?'Devendo':'Pago';
     await api.put(`/vendas/${v.id}/status`,{status_pagamento:novo}); load();
+  };
+  const excluirVenda = async (id) => {
+    if (!confirm('Tem certeza que deseja excluir esta venda?')) return;
+    try {
+      await api.delete(`/vendas/${id}`);
+      load();
+    } catch (err) {
+      alert(err.response?.data?.error || 'Erro ao excluir venda');
+    }
   };
   return(
     <div className="page">
@@ -23,7 +33,10 @@ export default function Historico(){
               <div style={{color:'var(--text-muted)', fontSize:'13px', marginTop:'4px'}}>{v.produtos?.map(p=>p.nome).join(', ')}</div>
               <div style={{fontWeight:800, color:'var(--success)', marginTop:'4px'}}>R$ {Number(v.valor_total).toFixed(2)}</div>
             </div>
-            <button onClick={()=>toggleStatus(v)} className={`status-pill ${v.status_pagamento==='Pago'?'status-ok':'status-pending'}`} style={{height:'fit-content'}}><i/>{v.status_pagamento}</button>
+            <div style={{display:'flex', gap:'8px', flexShrink:0}}>
+              <button onClick={()=>toggleStatus(v)} className={`status-pill ${v.status_pagamento==='Pago'?'status-ok':'status-pending'}`} style={{height:'fit-content'}}><i/>{v.status_pagamento}</button>
+              <button onClick={()=>excluirVenda(v.id)} className="button button-secondary" style={{padding:'8px 14px'}}><Trash2 size={14}/> Excluir</button>
+            </div>
           </div>
         ))}
         {!vendas.length && <div className="card" style={{padding:'48px', textAlign:'center', color:'var(--text-dim)'}}>Nenhuma venda ainda</div>}

@@ -35,6 +35,14 @@ export const atualizarProduto = async (req, res) => {
 
 export const removerProduto = async (req, res) => {
   const { id } = req.params;
+  
+  const { rows: vendasComProduto } = await pool.query(
+    'SELECT 1 FROM venda_produtos WHERE produto_id=$1 LIMIT 1', [id]
+  );
+  if (vendasComProduto.length > 0) {
+    throw new HttpError(400, 'Não é possível excluir produto que possui vendas registradas');
+  }
+
   const { rowCount } = await pool.query('DELETE FROM produtos WHERE id=$1', [id]);
   if (!rowCount) throw new HttpError(404, 'Produto não encontrado');
   res.status(204).send();

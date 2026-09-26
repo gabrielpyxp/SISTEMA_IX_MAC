@@ -80,3 +80,10 @@ export const atualizarStatusVenda = async (req, res) => {
   if (!rows.length) throw new HttpError(404, 'Venda não encontrada');
   res.json(rows[0]);
 };
+
+export const excluirVenda = async (req, res) => {
+  const { id } = req.params;
+  const { rowCount } = await pool.query('DELETE FROM vendas WHERE id=$1', [id]);
+  if (!rowCount) throw new HttpError(404, 'Venda não encontrada');
+  res.status(204).send();
+};
