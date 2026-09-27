@@ -293,10 +293,10 @@ export default function Historico(){
                   </div>
                 ))}
               </div>
-            )}
-          </div>
-        </div>
-      )}
+            </div>
+          </>
+        )}
+      )()}
       
       <div style={{display:'flex', flexDirection:'column', gap:'12px'}}>
         {vendasFiltradas.map(v=>(
