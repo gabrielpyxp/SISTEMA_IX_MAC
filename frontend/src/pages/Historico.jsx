@@ -250,10 +250,6 @@ export default function Historico(){
                   )}
                   <div style={{display: 'flex', flexDirection: 'column', gap: '12px'}}>
                     {devedoresFiltrados.map(d => (
-              <p style={{textAlign: 'center', color: 'var(--text-dim)', padding: '32px'}}>Nenhum devedor no momento</p>
-            ) : (
-              <div style={{display: 'flex', flexDirection: 'column', gap: '12px'}}>
-                {devedoresFiltrados.map(d => (
                   <div key={d.comprador} className="card" style={{padding: '16px', borderLeft: '4px solid var(--danger)'}}>
                     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px', flexWrap: 'wrap', gap: '8px'}}>
                       <div>
