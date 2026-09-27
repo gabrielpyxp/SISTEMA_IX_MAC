@@ -357,7 +357,7 @@ export const listarDevedoresAgrupados = async (_req, res) => {
   const { rows } = await pool.query(`
     SELECT 
       v.nome_comprador,
-      v.nome_equipe,
+      STRING_AGG(DISTINCT v.nome_equipe, ', ') as equipes,
       SUM(v.valor_total) as total_devendo,
       COUNT(v.id) as qtd_vendas,
       json_agg(
@@ -365,6 +365,7 @@ export const listarDevedoresAgrupados = async (_req, res) => {
           'id', v.id,
           'data', v.created_at,
           'valor', v.valor_total,
+          'equipe', v.nome_equipe,
           'produtos', (
             SELECT json_agg(json_build_object('nome', p.nome, 'quantidade', vp.quantidade, 'preco', p.preco))
             FROM venda_produtos vp
@@ -375,13 +376,13 @@ export const listarDevedoresAgrupados = async (_req, res) => {
       ) as vendas
     FROM vendas v
     WHERE v.status_pagamento = 'Devendo'
-    GROUP BY v.nome_comprador, v.nome_equipe
+    GROUP BY v.nome_comprador
     ORDER BY total_devendo DESC
   );
   
   const devedores = rows.map(row => ({
     comprador: row.nome_comprador,
-    equipe: row.nome_equipe,
+    equipe: row.equipes,
     total_devendo: Number(row.total_devendo),
     qtd_vendas: Number(row.qtd_vendas),
     vendas: row.vendas || []
