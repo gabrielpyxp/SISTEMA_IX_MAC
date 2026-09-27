@@ -356,7 +356,7 @@ export const atualizarCompradorVenda = async (req, res) => {
 export const listarDevedoresAgrupados = async (_req, res) => {
   const sql = 'SELECT ' +
     'v.nome_comprador, ' +
-    "STRING_AGG(DISTINCT v.nome_equipe, ', ') as equipe, " +
+    'v.nome_equipe as equipe, ' +
     'SUM(v.valor_total) as total_devendo, ' +
     'COUNT(v.id) as qtd_vendas, ' +
     'json_agg( ' +
@@ -375,7 +375,7 @@ export const listarDevedoresAgrupados = async (_req, res) => {
     ') as vendas ' +
     'FROM vendas v ' +
     "WHERE v.status_pagamento = 'Devendo' " +
-    'GROUP BY v.nome_comprador ' +
+    'GROUP BY v.nome_comprador, v.nome_equipe ' +
     'ORDER BY total_devendo DESC';
   
   const { rows } = await pool.query(sql);
@@ -392,7 +392,7 @@ export const listarDevedoresAgrupados = async (_req, res) => {
 };
 
 export const marcarTodasComoPagas = async (req, res) => {
-  const { nome_comprador } = req.body;
+  const { nome_comprador, nome_equipe } = req.body;
 
   if (!nome_comprador || !nome_comprador.trim()) {
     throw new HttpError(400, 'nome_comprador é obrigatório');
@@ -402,11 +402,16 @@ export const marcarTodasComoPagas = async (req, res) => {
   try {
     await client.query('BEGIN');
 
-    // Buscar todas as vendas "Devendo" desse comprador
-    const { rows: vendasDevendo } = await client.query(
-      `SELECT id FROM vendas WHERE nome_comprador = $1 AND status_pagamento = 'Devendo'`,
-      [nome_comprador.trim()]
-    );
+    // Buscar todas as vendas "Devendo" desse comprador (e equipe se fornecida)
+    let query = `SELECT id FROM vendas WHERE nome_comprador = $1 AND status_pagamento = 'Devendo'`;
+    const params = [nome_comprador.trim()];
+    
+    if (nome_equipe && nome_equipe.trim()) {
+      query += ` AND nome_equipe = $2`;
+      params.push(nome_equipe.trim());
+    }
+
+    const { rows: vendasDevendo } = await client.query(query, params);
 
     if (vendasDevendo.length === 0) {
       throw new HttpError(404, 'Nenhuma dívida encontrada para este comprador');

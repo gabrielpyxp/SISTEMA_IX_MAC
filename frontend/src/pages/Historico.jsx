@@ -81,19 +81,22 @@ export default function Historico(){
   };
   
   const marcarTodasPagas = async (devedor) => {
-    const confirmMsg = `Marcar TODAS as ${devedor.qtd_vendas} dívida(s) de "${devedor.comprador}" (R$ ${Number(devedor.total_devendo).toFixed(2)}) como PAGA?`;
+    const confirmMsg = `Marcar TODAS as ${devedor.qtd_vendas} dívida(s) de "${devedor.comprador}" ${devedor.equipe ? `(${devedor.equipe}) ` : ''}(R$ ${Number(devedor.total_devendo).toFixed(2)}) como PAGA?`;
     if (!confirm(confirmMsg)) return;
     
-    setLoadingActions(prev => ({...prev, [`marcar-${devedor.comprador}`]: true}));
+    setLoadingActions(prev => ({...prev, [`marcar-${devedor.comprador}-${devedor.equipe || ''}`]: true}));
     try {
-      await api.post('/vendas/devedores/marcar-pagas', { nome_comprador: devedor.comprador });
+      await api.post('/vendas/devedores/marcar-pagas', { 
+        nome_comprador: devedor.comprador,
+        nome_equipe: devedor.equipe
+      });
       alert(`✅ ${devedor.qtd_vendas} venda(s) marcada(s) como Paga!`);
       setShowDevedores(false);
       load();
     } catch (err) {
       alert(err.response?.data?.error || 'Erro ao marcar como pagas');
     } finally {
-      setLoadingActions(prev => ({...prev, [`marcar-${devedor.comprador}`]: false}));
+      setLoadingActions(prev => ({...prev, [`marcar-${devedor.comprador}-${devedor.equipe || ''}`]: false}));
     }
   };
 
