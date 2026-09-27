@@ -41,9 +41,17 @@ export default function Devedores() {
       };
       await api.post('/vendas/devedores/marcar-pagas', payload);
       alert(`✅ ${devedor.qtd_vendas} venda(s) marcada(s) como Paga!`);
-      load();
+      // Pequeno delay para garantir que o commit no banco terminou
+      setTimeout(() => load(), 300);
     } catch (err) {
-      alert(err.response?.data?.error || 'Erro ao marcar como pagas');
+      const msg = err.response?.data?.error || 'Erro ao marcar como pagas';
+      // Se não encontrou dívidas, é porque já pagou tudo - não é erro
+      if (msg.includes('Nenhuma dívida encontrada') || msg.includes('404')) {
+        alert('ℹ️ Essa pessoa/equipe já não tem mais dívidas pendentes.');
+        load(); // Atualiza a lista para remover da tela
+      } else {
+        alert(msg);
+      }
     } finally {
       setLoadingActions(prev => ({ ...prev, [loadKey]: false }));
     }
