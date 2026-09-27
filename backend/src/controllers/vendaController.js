@@ -403,18 +403,19 @@ export const marcarTodasComoPagas = async (req, res) => {
     await client.query('BEGIN');
 
     // Buscar todas as vendas "Devendo" desse comprador (e equipe se fornecida)
-    let query = `SELECT id FROM vendas WHERE nome_comprador = $1 AND status_pagamento = 'Devendo'`;
+    // Usa ILIKE para case-insensitive e trim para remover espaços
+    let query = `SELECT id FROM vendas WHERE nome_comprador ILIKE $1 AND status_pagamento = 'Devendo'`;
     const params = [nome_comprador.trim()];
     
     if (nome_equipe && nome_equipe.trim()) {
-      query += ` AND nome_equipe = $2`;
+      query += ` AND nome_equipe ILIKE $2`;
       params.push(nome_equipe.trim());
     }
 
     const { rows: vendasDevendo } = await client.query(query, params);
 
     if (vendasDevendo.length === 0) {
-      throw new HttpError(404, 'Nenhuma dívida encontrada para este comprador');
+      throw new HttpError(404, 'Nenhuma dívida encontrada para este comprador/equipe');
     }
 
     // Atualizar todas para "Pago"
