@@ -5,7 +5,8 @@ import { CheckCircle2, Loader2, Search, X, Users, Wallet, DollarSign } from 'luc
 export default function Devedores() {
   const [devedores, setDevedores] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchComprador, setSearchComprador] = useState('');
+  const [searchEquipe, setSearchEquipe] = useState('');
   const [loadingActions, setLoadingActions] = useState({});
   const [stats, setStats] = useState({ totalDevedores: 0, totalDivida: 0, totalVendas: 0 });
 
@@ -48,9 +49,11 @@ export default function Devedores() {
     }
   };
 
-  const devedoresFiltrados = devedores.filter(d =>
-    d.equipe && d.equipe.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const devedoresFiltrados = devedores.filter(d => {
+    const matchComprador = !searchComprador || d.comprador.toLowerCase().includes(searchComprador.toLowerCase());
+    const matchEquipe = !searchEquipe || (d.equipe && d.equipe.toLowerCase().includes(searchEquipe.toLowerCase()));
+    return matchComprador && matchEquipe;
+  });
 
   const equipesUnicas = [...new Set(devedores.map(d => d.equipe).filter(Boolean))].sort();
 
@@ -114,64 +117,109 @@ export default function Devedores() {
       </div>
 
       <div className="card" style={{ padding: '20px', marginBottom: '24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-          <div style={{ position: 'relative', flex: 1, minWidth: '280px', maxWidth: '500px' }}>
-            <Search size={20} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
-            <input
-              type="text"
-              placeholder="🔍 Pesquisar por equipe (ex: Sala, Liturgia, Mini Mercado)..."
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '12px 16px 12px 48px',
-                borderRadius: '10px',
-                border: '1px solid var(--border)',
-                background: 'var(--bg)',
-                color: 'var(--text)',
-                fontSize: '15px'
-              }}
-            />
-            {searchTerm && (
-              <button
-                onClick={() => setSearchTerm('')}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+            {/* Search Comprador */}
+            <div style={{ position: 'relative', flex: 1, minWidth: '250px', maxWidth: '400px' }}>
+              <Search size={20} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
+              <input
+                type="text"
+                placeholder="🔍 Comprador (ex: Gabriel, Maria)..."
+                value={searchComprador}
+                onChange={e => setSearchComprador(e.target.value)}
                 style={{
-                  position: 'absolute',
-                  right: '12px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  color: 'var(--text-dim)',
-                  cursor: 'pointer',
-                  padding: '6px'
+                  width: '100%',
+                  padding: '12px 16px 12px 48px',
+                  borderRadius: '10px',
+                  border: '1px solid var(--border)',
+                  background: 'var(--bg)',
+                  color: 'var(--text)',
+                  fontSize: '15px'
                 }}
-              >
-                <X size={18} />
-              </button>
-            )}
+              />
+              {searchComprador && (
+                <button
+                  onClick={() => setSearchComprador('')}
+                  style={{
+                    position: 'absolute',
+                    right: '12px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--text-dim)',
+                    cursor: 'pointer',
+                    padding: '6px'
+                  }}
+                >
+                  <X size={18} />
+                </button>
+              )}
+            </div>
+
+            {/* Search Equipe */}
+            <div style={{ position: 'relative', flex: 1, minWidth: '250px', maxWidth: '400px' }}>
+              <Search size={20} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
+              <input
+                type="text"
+                placeholder="🔍 Equipe (ex: Mini Mercado, Sala, Liturgia)..."
+                value={searchEquipe}
+                onChange={e => setSearchEquipe(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px 12px 48px',
+                  borderRadius: '10px',
+                  border: '1px solid var(--border)',
+                  background: 'var(--bg)',
+                  color: 'var(--text)',
+                  fontSize: '15px'
+                }}
+              />
+              {searchEquipe && (
+                <button
+                  onClick={() => setSearchEquipe('')}
+                  style={{
+                    position: 'absolute',
+                    right: '12px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--text-dim)',
+                    cursor: 'pointer',
+                    padding: '6px'
+                  }}
+                >
+                  <X size={18} />
+                </button>
+              )}
+            </div>
           </div>
-          {searchTerm && (
-            <span style={{ fontSize: '13px', color: 'var(--text-dim)', whiteSpace: 'nowrap' }}>
-              {devedoresFiltrados.length} de {devedores.length} devedores
-            </span>
-          )}
-          <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            {equipesUnicas.slice(0, 6).map(equipe => (
-              <button
-                key={equipe}
-                onClick={() => setSearchTerm(equipe)}
-                className={`button ${searchTerm.toLowerCase() === equipe.toLowerCase() ? 'button-primary' : 'button-secondary'}`}
-                style={{ fontSize: '12px', padding: '6px 12px', whiteSpace: 'nowrap' }}
-              >
-                {equipe}
-              </button>
-            ))}
-            {equipesUnicas.length > 6 && (
-              <span style={{ display: 'flex', alignItems: 'center', padding: '0 12px', color: 'var(--text-dim)', fontSize: '12px' }}>
-                +{equipesUnicas.length - 6} mais
+
+          {/* Result count + Quick filter buttons */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+            {(searchComprador || searchEquipe) && (
+              <span style={{ fontSize: '13px', color: 'var(--text-dim)' }}>
+                {devedoresFiltrados.length} de {devedores.length} devedores
               </span>
             )}
+            <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              {equipesUnicas.slice(0, 8).map(equipe => (
+                <button
+                  key={equipe}
+                  onClick={() => setSearchEquipe(equipe)}
+                  className={`button ${searchEquipe.toLowerCase() === equipe.toLowerCase() ? 'button-primary' : 'button-secondary'}`}
+                  style={{ fontSize: '12px', padding: '6px 12px', whiteSpace: 'nowrap' }}
+                >
+                  {equipe}
+                </button>
+              ))}
+              {equipesUnicas.length > 8 && (
+                <span style={{ display: 'flex', alignItems: 'center', padding: '0 12px', color: 'var(--text-dim)', fontSize: '12px' }}>
+                  +{equipesUnicas.length - 8} mais
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -186,10 +234,12 @@ export default function Devedores() {
         <div className="card" style={{ padding: '48px', textAlign: 'center', color: 'var(--text-dim)' }}>
           <Search size={48} style={{ color: 'var(--text-dim)', marginBottom: '16px', opacity: 0.5 }} />
           <h3 style={{ margin: '0 0 8px', color: 'var(--text)' }}>Nenhum devedor encontrado</h3>
-          <p>Tente outra equipe ou limpe a pesquisa</p>
-          <button onClick={() => setSearchTerm('')} className="button button-secondary" style={{ marginTop: '16px' }}>
-            Limpar pesquisa
-          </button>
+          <p>Tente outro nome ou equipe, ou limpe a pesquisa</p>
+          <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '16px' }}>
+            <button onClick={() => { setSearchComprador(''); setSearchEquipe(''); }} className="button button-secondary">
+              Limpar tudo
+            </button>
+          </div>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
