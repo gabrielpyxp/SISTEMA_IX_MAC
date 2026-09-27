@@ -337,10 +337,27 @@ export const exportarVendasExcel = async (_req, res) => {
   }
 };
 
+export const atualizarCompradorVenda = async (req, res) => {
+  const { id } = req.params;
+  const { nome_comprador } = req.body;
+
+  if (!nome_comprador || !nome_comprador.trim()) {
+    throw new HttpError(400, 'nome_comprador é obrigatório');
+  }
+
+  const { rows } = await pool.query(
+    'UPDATE vendas SET nome_comprador=$1 WHERE id=$2 RETURNING *',
+    [nome_comprador.trim(), id]
+  );
+  if (!rows.length) throw new HttpError(404, 'Venda não encontrada');
+  res.json(rows[0]);
+};
+
 export const listarDevedoresAgrupados = async (_req, res) => {
   const { rows } = await pool.query(`
     SELECT 
       v.nome_comprador,
+      v.nome_equipe,
       SUM(v.valor_total) as total_devendo,
       COUNT(v.id) as qtd_vendas,
       json_agg(
@@ -358,16 +375,58 @@ export const listarDevedoresAgrupados = async (_req, res) => {
       ) as vendas
     FROM vendas v
     WHERE v.status_pagamento = 'Devendo'
-    GROUP BY v.nome_comprador
+    GROUP BY v.nome_comprador, v.nome_equipe
     ORDER BY total_devendo DESC
-  `);
+  );
   
   const devedores = rows.map(row => ({
     comprador: row.nome_comprador,
+    equipe: row.nome_equipe,
     total_devendo: Number(row.total_devendo),
     qtd_vendas: Number(row.qtd_vendas),
     vendas: row.vendas || []
   }));
   
   res.json(devedores);
+};
+
+export const marcarTodasComoPagas = async (req, res) => {
+  const { nome_comprador } = req.body;
+
+  if (!nome_comprador || !nome_comprador.trim()) {
+    throw new HttpError(400, 'nome_comprador é obrigatório');
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    // Buscar todas as vendas "Devendo" desse comprador
+    const { rows: vendasDevendo } = await client.query(
+      `SELECT id FROM vendas WHERE nome_comprador = $1 AND status_pagamento = 'Devendo'`,
+      [nome_comprador.trim()]
+    );
+
+    if (vendasDevendo.length === 0) {
+      throw new HttpError(404, 'Nenhuma dívida encontrada para este comprador');
+    }
+
+    // Atualizar todas para "Pago"
+    const ids = vendasDevendo.map(v => v.id);
+    await client.query(
+      `UPDATE vendas SET status_pagamento = 'Pago' WHERE id = ANY($1)`,
+      [ids]
+    );
+
+    await client.query('COMMIT');
+    res.json({ 
+      message: `${vendasDevendo.length} venda(s) marcada(s) como Paga`,
+      vendas_atualizadas: vendasDevendo.length
+    });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
 };
