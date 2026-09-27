@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api.js';
-import { Trash2, Download, Users, Edit2, CheckCircle2, Loader2 } from 'lucide-react';
+import { Trash2, Download, Users, Edit2, CheckCircle2, Loader2, Search, X } from 'lucide-react';
 
 export default function Historico(){
   const [vendas,setVendas]=useState([]);
@@ -9,6 +9,7 @@ export default function Historico(){
   const [editingId, setEditingId] = useState(null);
   const [editNome, setEditNome] = useState('');
   const [loadingActions, setLoadingActions] = useState({});
+  const [searchTerm, setSearchTerm] = useState('');
   
   const load=async()=>{ const {data}=await api.get('/vendas'); setVendas(data); };
   useEffect(()=>{load();},[]);
@@ -81,24 +82,35 @@ export default function Historico(){
   };
   
   const marcarTodasPagas = async (devedor) => {
-    const confirmMsg = `Marcar TODAS as ${devedor.qtd_vendas} dívida(s) de "${devedor.comprador}" ${devedor.equipe ? `(${devedor.equipe}) ` : ''}(R$ ${Number(devedor.total_devendo).toFixed(2)}) como PAGA?`;
+    const equipeStr = devedor.equipe && devedor.equipe.trim() ? devedor.equipe.trim() : '';
+    const confirmMsg = `Marcar TODAS as ${devedor.qtd_vendas} dívida(s) de "${devedor.comprador}"${equipeStr ? ` (${equipeStr})` : ''} (R$ ${Number(devedor.total_devendo).toFixed(2)}) como PAGA?`;
     if (!confirm(confirmMsg)) return;
     
-    setLoadingActions(prev => ({...prev, [`marcar-${devedor.comprador}-${devedor.equipe || ''}`]: true}));
+    const loadKey = `marcar-${devedor.comprador}-${equipeStr}`;
+    setLoadingActions(prev => ({...prev, [loadKey]: true}));
     try {
-      await api.post('/vendas/devedores/marcar-pagas', { 
-        nome_comprador: devedor.comprador,
-        nome_equipe: devedor.equipe
-      });
+      const payload = { 
+        nome_comprador: devedor.comprador.trim(),
+        ...(equipeStr && { nome_equipe: equipeStr })
+      };
+      console.log('Enviando payload:', payload); // debug
+      await api.post('/vendas/devedores/marcar-pagas', payload);
       alert(`✅ ${devedor.qtd_vendas} venda(s) marcada(s) como Paga!`);
       setShowDevedores(false);
       load();
     } catch (err) {
+      console.error('Erro:', err.response?.data); // debug
       alert(err.response?.data?.error || 'Erro ao marcar como pagas');
     } finally {
-      setLoadingActions(prev => ({...prev, [`marcar-${devedor.comprador}-${devedor.equipe || ''}`]: false}));
+      setLoadingActions(prev => ({...prev, [loadKey]: false}));
     }
   };
+
+  // Filtrar vendas pelo termo de busca
+  const vendasFiltradas = vendas.filter(v => 
+    v.nome_comprador.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    v.nome_equipe.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return(
     <div className="page">
@@ -115,6 +127,47 @@ export default function Historico(){
           <button onClick={carregarDevedores} className="button button-secondary" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
             <Users size={16} /> Ver Devedores
           </button>
+        </div>
+        
+        {/* Search Input */}
+        <div style={{marginTop: '12px'}}>
+          <div style={{position: 'relative', maxWidth: '400px'}}>
+            <Search size={18} style={{position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)'}} />
+            <input
+              type="text"
+              placeholder="🔍 Pesquisar comprador ou equipe..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '10px 12px 10px 40px',
+                borderRadius: '8px',
+                border: '1px solid var(--border)',
+                background: 'var(--bg)',
+                color: 'var(--text)',
+                fontSize: '14px'
+              }}
+            />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-dim)',
+                  cursor: 'pointer',
+                  padding: '4px'
+                }}
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
+          {searchTerm && <p style={{fontSize: '12px', color: 'var(--text-dim)', marginTop: '4px'}}>{vendasFiltradas.length} de {vendas.length} vendas encontradas</p>}
         </div>
       </div>
       
@@ -150,11 +203,11 @@ export default function Historico(){
                         </span>
                         <button 
                           onClick={() => marcarTodasPagas(d)} 
-                          disabled={loadingActions[`marcar-${d.comprador}`]}
+                          disabled={loadingActions[`marcar-${d.comprador}-${d.equipe || ''}`]}
                           className="button button-success" 
                           style={{display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px'}}
                         >
-                          {loadingActions[`marcar-${d.comprador}`] ? <Loader2 size={16} /> : <CheckCircle2 size={16} />}
+                          {loadingActions[`marcar-${d.comprador}-${d.equipe || ''}`] ? <Loader2 size={16} /> : <CheckCircle2 size={16} />}
                           Marcar Tudo Pago
                         </button>
                       </div>
@@ -183,7 +236,7 @@ export default function Historico(){
       )}
       
       <div style={{display:'flex', flexDirection:'column', gap:'12px'}}>
-        {vendas.map(v=>(
+        {vendasFiltradas.map(v=>(
           <div key={v.id} className="card" style={{padding:'16px', display:'flex', justifyContent:'space-between', gap:'12px'}}>
             <div style={{minWidth:0, flex:1}}>
               {editingId === v.id ? (
@@ -221,7 +274,14 @@ export default function Historico(){
             </div>
           </div>
         ))}
-        {!vendas.length && <div className="card" style={{padding:'48px', textAlign:'center', color:'var(--text-dim)'}}>Nenhuma venda ainda</div>}
+        {vendasFiltradas.length === 0 && (
+          <div className="card" style={{padding:'48px', textAlign:'center', color:'var(--text-dim)'}}>
+            {searchTerm 
+              ? `Nenhuma venda encontrada para "${searchTerm}"`
+              : 'Nenhuma venda ainda'
+            }
+          </div>
+        )}
       </div>
     </div>
   );
