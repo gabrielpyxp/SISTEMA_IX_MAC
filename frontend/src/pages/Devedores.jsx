@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api.js';
-import { CheckCircle2, Loader2, Search, X, Users, CreditCard, DollarSign } from 'lucide-react';
+import { CheckCircle2, Loader2, Search, X, Users, Wallet, DollarSign } from 'lucide-react';
 
 export default function Devedores() {
   const [devedores, setDevedores] = useState([]);
@@ -95,7 +95,7 @@ export default function Devedores() {
         <div className="card" style={{padding: '20px', borderLeft: '4px solid var(--success)'}}>
           <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
             <div style={{width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(34,197,94,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-              <CreditCard size={24} style={{color: 'var(--success)'}} />
+              <Wallet size={24} style={{color: 'var(--success)'}} />
             </div>
             <div>
               <div style={{fontSize: '12px', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.05em'}}>Vendas Pendentes</div>
@@ -172,7 +172,9 @@ export default function Devedores() {
       {/* Lista de Devedores */}
       {loading ? (
         <div className="card" style={{padding: '48px', textAlign: 'center'}}>
-          <Loader2 size={32} className="animate-spin" style={{color: 'var(--yellow)', marginBottom: '12px'}} />
+          <div className="animate-spin" style={{color: 'var(--yellow)', marginBottom: '12px', display: 'inline-block'}}>
+            <Loader2 size={32} style={{color: 'var(--yellow)'}} />
+          </div>
           <p style={{color: 'var(--text-dim)'}}>Carregando devedores...</p>
         </div>
       ) : devedores.length === 0 ? (
