@@ -10,6 +10,7 @@ export default function Historico(){
   const [editNome, setEditNome] = useState('');
   const [loadingActions, setLoadingActions] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
+  const [devedoresSearch, setDevedoresSearch] = useState('');
   
   const load=async()=>{ const {data}=await api.get('/vendas'); setVendas(data); };
   useEffect(()=>{load();},[]);
@@ -178,15 +179,81 @@ export default function Historico(){
           background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
         }}>
           <div className="card" style={{width: '90%', maxWidth: '800px', maxHeight: '80vh', overflow: 'auto', padding: '24px'}} onClick={e => e.stopPropagation()}>
-            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px'}}>
-              <h2 style={{margin: 0}}>📋 Devedores Agrupados</h2>
-              <button onClick={() => setShowDevedores(false)} className="button button-secondary">Fechar</button>
+            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexDirection: 'column', gap: '12px', alignItems: 'stretch'}}>
+              <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                <h2 style={{margin: 0}}>📋 Devedores Agrupados</h2>
+                <button onClick={() => setShowDevedores(false)} className="button button-secondary">Fechar</button>
+              </div>
+              {/* Search by equipe in devedores modal */}
+              <div style={{position: 'relative', maxWidth: '400px'}}>
+                <Search size={18} style={{position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)'}} />
+                <input
+                  type="text"
+                  placeholder="🔍 Pesquisar por equipe (ex: Sala, Liturgia)..."
+                  value={devedoresSearch}
+                  onChange={e => setDevedoresSearch(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px 10px 40px',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border)',
+                    background: 'var(--bg)',
+                    color: 'var(--text)',
+                    fontSize: '14px'
+                  }}
+                />
+                {devedoresSearch && (
+                  <button
+                    onClick={() => setDevedoresSearch('')}
+                    style={{
+                      position: 'absolute',
+                      right: '10px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--text-dim)',
+                      cursor: 'pointer',
+                      padding: '4px'
+                    }}
+                  >
+                    <X size={16} />
+                  </button>
+                )}
+              </div>
             </div>
-            {devedores.length === 0 ? (
+            
+            {/* Filtrar devedores por equipe */}
+            {(() => {
+              const devedoresFiltrados = devedores.filter(d => 
+                d.equipe && d.equipe.toLowerCase().includes(devedoresSearch.toLowerCase())
+              );
+              
+              if (devedores.length === 0) {
+                return <p style={{textAlign: 'center', color: 'var(--text-dim)', padding: '32px'}}>Nenhum devedor no momento</p>;
+              }
+              
+              if (devedoresFiltrados.length === 0) {
+                return (
+                  <p style={{textAlign: 'center', color: 'var(--text-dim)', padding: '32px'}}>
+                    Nenhum devedor encontrado para equipe "{devedoresSearch}"
+                  </p>
+                );
+              }
+              
+              return (
+                <>
+                  {devedoresSearch && (
+                    <p style={{fontSize: '12px', color: 'var(--text-dim)', marginBottom: '8px'}}>
+                      {devedoresFiltrados.length} de {devedores.length} devedores encontrados
+                    </p>
+                  )}
+                  <div style={{display: 'flex', flexDirection: 'column', gap: '12px'}}>
+                    {devedoresFiltrados.map(d => (
               <p style={{textAlign: 'center', color: 'var(--text-dim)', padding: '32px'}}>Nenhum devedor no momento</p>
             ) : (
               <div style={{display: 'flex', flexDirection: 'column', gap: '12px'}}>
-                {devedores.map(d => (
+                {devedoresFiltrados.map(d => (
                   <div key={d.comprador} className="card" style={{padding: '16px', borderLeft: '4px solid var(--danger)'}}>
                     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px', flexWrap: 'wrap', gap: '8px'}}>
                       <div>
