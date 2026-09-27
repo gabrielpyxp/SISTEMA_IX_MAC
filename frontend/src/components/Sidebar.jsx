@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, ShoppingCart, Package, History, X, LogOut, Users, CreditCard } from 'lucide-react';
+import { LayoutDashboard, ShoppingCart, Package, History, X, LogOut, Users } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext.jsx';
 
 const items = [
