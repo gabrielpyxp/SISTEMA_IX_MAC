@@ -9,6 +9,7 @@ import Vendas from './pages/Vendas.jsx';
 import Produtos from './pages/Produtos.jsx';
 import Historico from './pages/Historico.jsx';
 import Dashboard from './pages/Dashboard.jsx';
+import Devedores from './pages/Devedores.jsx';
 
 function Shell() {
   const { user, logout, loading } = useAuth();
@@ -33,6 +34,7 @@ function Shell() {
     '/dashboard': { title: 'Dashboard', breadcrumb: 'MAC / Dashboard' },
     '/historico': { title: 'Histórico', breadcrumb: 'MAC / Histórico' },
     '/produtos': { title: 'Produtos', breadcrumb: 'MAC / Produtos' },
+    '/devedores': { title: 'Devedores', breadcrumb: 'MAC / Devedores' },
   };
   const cur = titles[pathname] || { title: 'MAC', breadcrumb: 'MAC' };
   const handleLogout = () => { logout(); nav('/login'); };
@@ -48,6 +50,7 @@ function Shell() {
             <Route path="/produtos" element={<ProtectedRoute><Produtos /></ProtectedRoute>} />
             <Route path="/historico" element={<ProtectedRoute><Historico /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/devedores" element={<ProtectedRoute><Devedores /></ProtectedRoute>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>

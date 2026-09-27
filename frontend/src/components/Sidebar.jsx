@@ -1,11 +1,12 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, ShoppingCart, Package, History, X, LogOut } from 'lucide-react';
+import { LayoutDashboard, ShoppingCart, Package, History, X, LogOut, Users, CreditCard } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext.jsx';
 
 const items = [
   { to: '/', label: 'Nova Venda', icon: ShoppingCart, caption: 'PDV' },
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, caption: 'Métricas' },
   { to: '/historico', label: 'Histórico', icon: History, caption: 'Vendas' },
+  { to: '/devedores', label: 'Devedores', icon: Users, caption: 'Cobrança' },
   { to: '/produtos', label: 'Produtos', icon: Package, caption: 'Estoque' },
 ];
 
